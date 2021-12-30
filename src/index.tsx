@@ -9,8 +9,10 @@ import {
 	Route,
 	Redirect,
 } from "react-router-dom";
-
 import { History } from "./pages/history";
+import { useStateWithStorage } from "./hooks/use_state_with_storage";
+
+const StorageKey = "./editor:text";
 
 const GlobalStyle = createGlobalStyle`
      body * {
@@ -18,19 +20,24 @@ const GlobalStyle = createGlobalStyle`
     }
 `;
 
-const Main = (
-	<>
-		<GlobalStyle />
-		<Router>
-			<Route exact path="/editor">
-				<Editor />
-			</Route>
-			<Route exact path="/history">
-				<History />
-			</Route>
-			<Redirect to="/editor" path="" />
-		</Router>
-	</>
-);
+const Main: React.FC = () => {
+	const [text, setText] = useStateWithStorage("", StorageKey);
+	return (
+		<>
+			<GlobalStyle />
+			<Router>
+				<Switch>
+					<Route exact path="/editor">
+						<Editor text={text} setText={setText} />
+					</Route>
+					<Route exact path="/history">
+						<History setText={setText} />
+					</Route>
+					<Redirect to="/editor" path="" />
+				</Switch>
+			</Router>
+		</>
+	);
+};
 
-render(Main, document.getElementById("app"));
+render(<Main />, document.getElementById("app"));
